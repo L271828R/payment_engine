@@ -1,0 +1,10 @@
+env/
+.eggs/
+.pytest_cache/
+.vscode/
+payment_engine.egg-info/
+payment_engine/__pycache__
+payment_engine/.vscode/
+tests/__pycache__
+
+
