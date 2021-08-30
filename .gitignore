@@ -2,6 +2,8 @@ env/
 .eggs/
 .pytest_cache/
 .vscode/
+.DS_Store
+build/
 payment_engine.egg-info/
 payment_engine/__pycache__
 payment_engine/.vscode/

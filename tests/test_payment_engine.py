@@ -1,5 +1,7 @@
 import pytest
-from payment_engine import TransactionEngine
+# from payment_engine import PaymentEngine
+# from payment_engine import PaymentEngine
+from payment_engine.core.engine import PaymentEngine
 #TODO change ids to numbers as per doc. two of them
 
 def test_base_happy_path():
@@ -14,7 +16,7 @@ def test_base_happy_path():
     expected = {'1': 
         {'client':'1', 'total': 1.5, 'available': 1.5, 'held': 0.0, 'locked': 'false'},
          '2': {'client': '2', 'total': 2.0, 'available': 2.0, 'held': 0.0, 'locked':'false'}}
-    transaction_engine = TransactionEngine(write_on_update=False)
+    transaction_engine = PaymentEngine(write_on_update=False)
     transaction_engine.transactions_by_clients = data
     transaction_engine.process_transactions()
     results = transaction_engine.clients_accounts
@@ -30,7 +32,7 @@ def test_one_dispute_one_client():
         }
     expected = {'1': 
         {'client': '1', 'total': 1.5, 'available': 0.5, 'held': 1.0, 'locked':'false'}}
-    transaction_engine = TransactionEngine(write_on_update=False)
+    transaction_engine = PaymentEngine(write_on_update=False)
     transaction_engine.transactions_by_clients = data
     transaction_engine.process_transactions()
     results = transaction_engine.clients_accounts
@@ -46,7 +48,7 @@ def test_one_dispute_one_client_large():
         }
     expected = {'1': 
         {'client': '1', 'total': 1.5, 'available': -0.5, 'held': 2.0, 'locked':'false'}}
-    transaction_engine = TransactionEngine(write_on_update=False)
+    transaction_engine = PaymentEngine(write_on_update=False)
     transaction_engine.transactions_by_clients = data
     transaction_engine.process_transactions()
     results = transaction_engine.clients_accounts
@@ -64,7 +66,7 @@ def test_one_dispute_one_resolve_one_client():
         }
     expected = {'1': 
         {'client': '1', 'total': 1.5, 'available': 1.5, 'held': 0.0, 'locked':'false'}}
-    transaction_engine = TransactionEngine(write_on_update=False)
+    transaction_engine = PaymentEngine(write_on_update=False)
     transaction_engine.transactions_by_clients = data
     transaction_engine.process_transactions()
     results = transaction_engine.clients_accounts
@@ -83,7 +85,23 @@ def test_one_dispute_one_chargeback():
         }
     expected = {'1': 
         {'client': '1', 'total': 0.5, 'available': 0.5, 'held': 0.0, 'locked':'true'}}
-    transaction_engine = TransactionEngine(write_on_update=False)
+    transaction_engine = PaymentEngine(write_on_update=False)
+    transaction_engine.transactions_by_clients = data
+    transaction_engine.process_transactions()
+    results = transaction_engine.clients_accounts
+    assert (expected == results)
+
+
+
+def test_precision():
+    data = {'1': [
+            {'tx': '1', 'type': 'deposit', 'amount': 1.0010},    #  total 1.0 available 1.0 held 0.0
+            {'tx': '4', 'type': 'withdrawal', 'amount': 0.0001}, #  total 1.5  available 1.5 held 0.0
+            ], 
+        }
+    expected = {'1': 
+        {'client': '1', 'total': 1.0009, 'available': 1.0009, 'held': 0.0, 'locked':'false'}}
+    transaction_engine = PaymentEngine(write_on_update=False)
     transaction_engine.transactions_by_clients = data
     transaction_engine.process_transactions()
     results = transaction_engine.clients_accounts
