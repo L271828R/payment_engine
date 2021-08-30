@@ -8,5 +8,7 @@ payment_engine.egg-info/
 payment_engine/__pycache__
 payment_engine/.vscode/
 tests/__pycache__
+payment_engine/core/__pycache__/
+*.pyc
 
 
