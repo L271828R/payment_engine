@@ -52,25 +52,24 @@ class TransactionEngine():
                 transactions_by_clients[client_id].append({'tx': tx,'type':trans_type, 'amount': amount})
             return transactions_by_clients
 
-    def execute_dispute(self, tx_id, transactions):
-        print('INSIDE EXECUTED DISPUTES')
-        input()
-        pass
-
     def _process_transactions(self, transactions_by_clients):
         clients = {}
         disputed_resolution = {}
         for client in transactions_by_clients:
-            need_to_recalculate = True
             tx_id_amount_lookup = {}
             total = 0.0
             held = 0.0
             available = 0.0
             locked = 'false'
+            clients[client] = {"locked": "false"}
             for transaction in transactions_by_clients[client]:
                 trans_type = transaction['type']
                 tx_id = transaction['tx']
-                if trans_type == "deposit":
+                if clients[client]["locked"] == "true":
+                    is_locked = True
+                else:
+                    is_locked = False
+                if trans_type == "deposit" and not is_locked:
                     if tx_id not in disputed_resolution:
                         tx_id_amount_lookup[tx_id] = transaction["amount"]
                         total += float(transaction["amount"])
@@ -81,7 +80,7 @@ class TransactionEngine():
                         if self.write_on_update:
                             self.update_clients_accounts_file(clients)
 
-                elif trans_type == "withdrawal":
+                elif trans_type == "withdrawal" and not is_locked:
                     tx_id_amount_lookup[tx_id] = transaction["amount"]
                     amount = float(transaction["amount"])
                     if amount <= available: 
@@ -92,7 +91,7 @@ class TransactionEngine():
                         assert(total == available + held)
                         if self.write_on_update:
                             self.update_clients_accounts_file(clients)
-                elif trans_type == "dispute":
+                elif trans_type == "dispute" and not is_locked:
                     if tx_id in tx_id_amount_lookup and tx_id not in disputed_resolution:
                         amount = tx_id_amount_lookup[tx_id]
                         available -= amount
@@ -104,7 +103,7 @@ class TransactionEngine():
                         assert(total == available + held)
                         if self.write_on_update:
                             self.update_clients_accounts_file(clients)
-                elif trans_type == "resolve":
+                elif trans_type == "resolve" and not is_locked:
                     if tx_id in tx_id_amount_lookup and \
                         tx_id in disputed_resolution and \
                         disputed_resolution[tx_id]==None:
@@ -116,30 +115,22 @@ class TransactionEngine():
                         clients[client] = {"client": client, "total" : total, \
                            "available": available, "held": held, "locked": locked}
                         assert(total == available + held)
-                elif trans_type == "chargeback":
+                elif trans_type == "chargeback" and not is_locked:
                     if tx_id in tx_id_amount_lookup and \
                         tx_id in disputed_resolution and \
                         disputed_resolution[tx_id]==None:
                         amount = tx_id_amount_lookup[tx_id]
                         disputed_resolution[tx_id] = "chargeback"
-                        available += amount
+                        #available += amount
                         held -= amount
-                        locked = "True"
+                        locked = "true"
+                        total = available + held
                         clients[client] = {"client": client, "total" : total, \
                            "available": available, "held": held, "locked": locked}
                         assert(total == available + held)
                 assert(total == available + held)
         return clients
 
-    def process_disputes(self, clients, disputes_by_clients, deposits_withdrawals_by_clients):
-        for client_id in disputes_by_clients:
-            for disputed_tx_id in disputes_by_clients[client_id]:
-                if disputed_tx_id in deposits_withdrawals_by_clients[client_id] and \
-                        deposits_withdrawals_by_clients[client_id][disputed_tx_id]["type"] == "deposit":
-                    #TODO need to lookup amount
-                    clients[client_id]["available"] -= deposits_withdrawals_by_clients[client_id][disputed_tx_id]['amount']
-                    clients[client_id]["held"]      += deposits_withdrawals_by_clients[client_id][disputed_tx_id]['amount']
-        return clients
 
 def main():
     path_to_file = sys.argv[1]
@@ -147,7 +138,6 @@ def main():
     transaction_engine.extract_transactions_by_client(path_to_file)
     transaction_engine.process_transactions()
     print(transaction_engine.transactions_by_clients)
-    print("====")
     print(transaction_engine.clients_accounts)
 
 if __name__ == '__main__':

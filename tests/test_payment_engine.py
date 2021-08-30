@@ -71,18 +71,18 @@ def test_one_dispute_one_resolve_one_client():
     assert (expected == results)
 
 
-def one_dispute_one_chargeback():
+def test_one_dispute_one_chargeback():
     data = {'1': [
             {'tx': '1', 'type': 'deposit', 'amount': 1.0},    #  total 1.0 available 1.0 held 0.0
             {'tx': '3', 'type': 'deposit', 'amount': 2.0},    #  total 3.0 available 3.0 held 0.0
             {'tx': '4', 'type': 'withdrawal', 'amount': 1.5}, #  total 1.5  available 1.5 held 0.0
             {'tx': '1', 'type': 'dispute', },                 #  total 1.5  available 0.5 held 1.0
             {'tx': '5', 'type': 'withdrawal', 'amount': 1.5}, #x total 1.5 available 0.5 held 1.0
-            {'tx': '1', 'type': 'chargeback', },                 #  total 1.5 available 1.5 held 0.0
+            {'tx': '1', 'type': 'chargeback', },              #  total 0.5 available 0.5 held 0.0 locked
             ], 
         }
     expected = {'1': 
-        {'client': '1', 'total': 1.5, 'available': 1.5, 'held': 0.0, 'locked':'false'}}
+        {'client': '1', 'total': 0.5, 'available': 0.5, 'held': 0.0, 'locked':'true'}}
     transaction_engine = TransactionEngine(write_on_update=False)
     transaction_engine.transactions_by_clients = data
     transaction_engine.process_transactions()
