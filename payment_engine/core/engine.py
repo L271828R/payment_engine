@@ -47,39 +47,45 @@ class PaymentEngine():
             return transactions_by_clients
 
     def _deposits_logic(self, client, tx_id, transaction, totals):
-        totals.tx_id_amount_lookup[tx_id] = transaction["amount"]
-        totals.total += float(transaction["amount"])
-        totals.available += float(transaction["amount"])
-        totals.clients[client] = {"client": client, "total" : totals.total, \
-            "available": totals.available, "held": totals.held, "locked": totals.locked}
-        assert(totals.total == totals.available + totals.held)
-
-    def _withdrawals_logic(self, client, tx_id, transaction, totals):
-        totals.tx_id_amount_lookup[tx_id] = transaction["amount"]
-        amount = float(transaction["amount"])
-        if amount <= totals.available: 
-            totals.total -= float(transaction["amount"])
-            totals.available -= float(transaction["amount"])
+        if tx_id not in totals.processed_transactions:
+            totals.tx_id_amount_lookup[tx_id] = transaction["amount"]
+            #totals.total += transaction["amount"]
+            totals.available += transaction["amount"]
+            totals.total += transaction["amount"]
             totals.clients[client] = {"client": client, "total" : totals.total, \
                 "available": totals.available, "held": totals.held, "locked": totals.locked}
+            totals.processed_transactions[tx_id] = "deposit"
+            assert(totals.total == totals.available + totals.held)
 
-    def _disputes_logic(self, client, tx_id, transaction, disputed_resolution, totals):
-        if tx_id in totals.tx_id_amount_lookup and tx_id not in disputed_resolution:
+    def _withdrawals_logic(self, client, tx_id, transaction, totals):
+        if tx_id not in totals.processed_transactions:
+            totals.tx_id_amount_lookup[tx_id] = transaction["amount"]
+            amount = transaction["amount"]
+            if amount <= totals.available: 
+                totals.total -= transaction["amount"]
+                totals.available -= transaction["amount"]
+                totals.clients[client] = {"client": client, "total" : totals.total, \
+                    "available": totals.available, "held": totals.held, "locked": totals.locked}
+                totals.processed_transactions[tx_id] = "withdrawal"
+
+    def _disputes_logic(self, client, tx_id, totals):
+        if tx_id in totals.tx_id_amount_lookup and \
+            totals.processed_transactions[tx_id] == "deposit":
             amount = totals.tx_id_amount_lookup[tx_id]
             totals.available -= amount
             totals.held += amount
-            disputed_resolution[tx_id] = None
+            totals.disputed_resolution[tx_id] = None
             totals.total = totals.available + totals.held
             totals.clients[client] = {"client": client, "total" : totals.total, \
                 "available": totals.available, "held": totals.held, "locked": totals.locked}
             assert(totals.total == totals.available + totals.held)
 
-    def _resolves_logic(self, client, tx_id, transaction, disputed_resolution, totals):
+    def _resolves_logic(self, client, tx_id, transaction, totals):
         if tx_id in totals.tx_id_amount_lookup and \
-            tx_id in disputed_resolution and \
-            disputed_resolution[tx_id]==None:
+            tx_id in totals.disputed_resolution and \
+            totals.disputed_resolution[tx_id]==None:
             amount = totals.tx_id_amount_lookup[tx_id]
-            disputed_resolution[tx_id] = "resolve"
+            totals.disputed_resolution[tx_id] = "resolve"
             totals.held -= amount
             totals.available += amount
             totals.total = totals.available + totals.held
@@ -87,12 +93,12 @@ class PaymentEngine():
                 "available": totals.available, "held": totals.held, "locked": totals.locked}
             assert(totals.total == totals.available + totals.held)
 
-    def _chargeback_logic(self, client, tx_id, transaction, disputed_resolution, totals):
+    def _chargeback_logic(self, client, tx_id, transaction, totals):
         if tx_id in totals.tx_id_amount_lookup and \
-            tx_id in disputed_resolution and \
-            disputed_resolution[tx_id]==None:
+            tx_id in totals.disputed_resolution and \
+            totals.disputed_resolution[tx_id]==None:
             amount = totals.tx_id_amount_lookup[tx_id]
-            disputed_resolution[tx_id] = "chargeback"
+            totals.disputed_resolution[tx_id] = "chargeback"
             #available += amount
             totals.held -= amount
             totals.locked = "true"
@@ -102,10 +108,10 @@ class PaymentEngine():
             assert(totals.total == totals.available + totals.held)
 
     def _process_transactions(self, transactions_by_clients):
-        clients = {}
-        disputed_resolution = {}
         totals = TotalsHelper()
+        totals.disputed_resolution = {}
         totals.clients ={}
+        totals.processed_transactions = {}
         for client in transactions_by_clients:
             totals.tx_id_amount_lookup = {}
             totals.total = 0.0
@@ -129,12 +135,13 @@ class PaymentEngine():
                     if self.write_on_update:
                         self.update_clients_accounts_file(totals.clients)
                 elif trans_type == "dispute" and not is_locked:
-                    self._disputes_logic(client, tx_id, transaction, disputed_resolution, totals)
+                    self._disputes_logic(client, tx_id, totals)
                     if self.write_on_update:
                         self.update_clients_accounts_file(totals.clients)
                 elif trans_type == "resolve" and not is_locked:
-                    self._resolves_logic(client, tx_id, transaction, disputed_resolution, totals)
+                    self._resolves_logic(client, tx_id, transaction, totals)
                 elif trans_type == "chargeback" and not is_locked:
-                    self._chargeback_logic(client, tx_id, transaction, disputed_resolution, totals)
+                    self._chargeback_logic(client, tx_id, transaction, totals)
                 assert(totals.total == totals.available + totals.held)
+                
         return totals.clients
