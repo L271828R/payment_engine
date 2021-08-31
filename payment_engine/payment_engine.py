@@ -16,8 +16,10 @@ def main():
     payment_engine = PaymentEngine(write_on_update=False)
     # payment_engine.extract_transactions_by_client(path_to_file)
     data = {'1': [
-            {'tx': '1', 'type': 'deposit', 'amount': 1.0},    #  total 1.0 available 1.0 held 0.0
-            {'tx': '1', 'type': 'deposit', 'amount': 1.0},    #  duplicate
+            {'tx': '1', 'type': 'deposit', 'amount': 1.0}, 
+            {'tx': '3', 'type': 'deposit', 'amount': 2.0}, 
+            {'tx': '4', 'type': 'withdrawal', 'amount': 1.5},
+            {'tx': '1', 'type': 'dispute', }
             ], 
         }
     PaymentEngine.transactions_by_clients = data
