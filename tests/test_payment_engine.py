@@ -1,6 +1,4 @@
 import pytest
-# from payment_engine import PaymentEngine
-# from payment_engine import PaymentEngine
 from payment_engine.core.engine import PaymentEngine
 #TODO change ids to numbers as per doc. two of them
 
