@@ -1,3 +1,4 @@
+import os
 import csv
 
 class TotalsHelper():
@@ -30,24 +31,25 @@ class PaymentEngine():
 
     def transaction_file_reader(self, path_to_file):
         transactions_by_clients = {}
-        with open(path_to_file) as csvfile:
-            reader = csv.DictReader(csvfile)
-            for row in reader:
-                trans_type = row['type'].replace(" ","")
-                client_id  = row['client'].replace(" ","")
-                tx         = row['tx'].replace(" ","")
-                try:
-                    amount     = float(row['amount'])
-                except ValueError:
-                    amount     = 0
-                parsed_row = {'type': trans_type, 
-                        'client_id': client_id,
-                        'tx': tx,
-                        'amount': amount}
-                if client_id not in transactions_by_clients:
-                    transactions_by_clients[client_id] = []
-                transactions_by_clients[client_id].append({'tx': tx,'type':trans_type, 'amount': amount})
-            return transactions_by_clients
+        file_body_extension_tup = os.path.splitext(path_to_file)
+        if file_body_extension_tup[1] == ".csv":
+            with open(path_to_file) as csvfile:
+                reader = csv.DictReader(csvfile)
+                rows = [ { k.strip(): v.strip() for k,v in row.items() } for row in reader ]
+                for row in rows:
+                    trans_type = row['type']
+                    tx         = row['tx']
+                    client_id  = row['client']
+                    try:
+                        amount     = float(row['amount'])
+                    except ValueError:
+                        amount     = 0
+                    if client_id not in transactions_by_clients:
+                        transactions_by_clients[client_id] = []
+                    transactions_by_clients[client_id].append({'tx': tx,'type':trans_type, 'amount': amount})
+                return transactions_by_clients
+        else:
+            raise(Exception("FILE NOT SUPPORTED, CSV ONLY"))
 
     def _deposits_logic(self, client, tx_id, transaction, totals):
         if tx_id not in totals.processed_transactions:
