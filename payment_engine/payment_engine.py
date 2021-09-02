@@ -1,5 +1,5 @@
-import sys
 from core.engine import PaymentEngine
+from core import python_version_validation
 
 # TODO what if chargeback does not point back to dispute
 # TODO raise any unsupported transaction types
@@ -16,4 +16,5 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    if python_version_validation.validate(3,4):
+        main()
