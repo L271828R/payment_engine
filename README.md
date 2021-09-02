@@ -16,6 +16,8 @@
       </ul>
     </li>
     <li><a href="#usage">Usage</a></li>
+    <li><a href="#correctness">Correctness</a></li>
+    <li><a href="#running-tests">Running Tests</a></li>
   </ol>
 </details>
 
@@ -67,6 +69,7 @@ You will need Python3 in order to run this script.
    ```sh
    pip install -r requirements.txt
    ```
+In step 5 the most notable install will be pytest, a library for running unit tests.
 <!-- USAGE EXAMPLES -->
 ## Usage
 
