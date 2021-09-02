@@ -7,7 +7,7 @@ isort==5.9.3
 lazy-object-proxy==1.6.0
 mccabe==0.6.1
 packaging==21.0
--e git+https://github.com/L271828R/payment_engine.git@b03299b231a6ce0783434b41623c704494bdbfab#egg=payment_engine
+-e git+https://github.com/L271828R/payment_engine.git@24e6d4ddb73b01bd5ef89efdc2318567776d7e0e#egg=payment_engine
 platformdirs==2.3.0
 pluggy==0.13.1
 py==1.10.0
