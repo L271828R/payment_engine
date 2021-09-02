@@ -1,12 +1,22 @@
+astroid==2.7.3
 attrs==21.2.0
+flake8==3.9.2
 importlib-metadata==4.8.0
 iniconfig==1.1.1
+isort==5.9.3
+lazy-object-proxy==1.6.0
+mccabe==0.6.1
 packaging==21.0
--e git+https://github.com/L271828R/payment_engine.git@96f92bac936cb5ffef5dd3f1b030fb5f98d3df99#egg=payment_engine
+-e git+https://github.com/L271828R/payment_engine.git@b03299b231a6ce0783434b41623c704494bdbfab#egg=payment_engine
+platformdirs==2.3.0
 pluggy==0.13.1
 py==1.10.0
+pycodestyle==2.7.0
+pyflakes==2.3.1
 pyparsing==2.4.7
 pytest==6.2.4
 toml==0.10.2
+typed-ast==1.4.3
 typing-extensions==3.10.0.0
+wrapt==1.12.1
 zipp==3.5.0
