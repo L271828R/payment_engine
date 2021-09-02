@@ -1,18 +1,19 @@
+import sys
 from core.engine import PaymentEngine
 from core import python_version_validation
 
 # TODO what if chargeback does not point back to dispute
 # TODO raise any unsupported transaction types
+# TODO test for non supported type
 
 
 def main():
-    # path_to_file = sys.argv[1]
-    path_to_file = "tests/test_files/transactions_dup_dispute.csv"
-    payment_engine = PaymentEngine(print_on_update=True)
+    path_to_file = sys.argv[1]
+    payment_engine = PaymentEngine(print_on_update=False)
     payment_engine.extract_transactions_by_client(path_to_file)
     payment_engine.process_transactions()
-    accounts = payment_engine.clients_accounts
-    payment_engine.update_clients_accounts_file(accounts)
+    client_accounts = payment_engine.client_accounts
+    payment_engine.print_to_stdout(client_accounts)
 
 
 if __name__ == '__main__':

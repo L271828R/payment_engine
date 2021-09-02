@@ -21,8 +21,18 @@ class PaymentEngine():
             self.transaction_file_reader(path_to_file)
 
     def process_transactions(self):
-        self.clients_accounts = \
+        self.client_accounts = \
             self._process_transactions(self.transactions_by_clients)
+
+
+    def print_to_stdout(self, client_accounts):
+        fieldnames = ['client', 'available', 'held', 'total', 'locked']
+        print(f"{fieldnames[0]},{fieldnames[1]},{fieldnames[2]}," +
+              f"{fieldnames[3]},{fieldnames[4]}")
+        for client in client_accounts:
+            row = client_accounts[client]
+            print(f"{row['client']},{row['available']},{row['held']}," +
+                  f"{row['total']},{row['locked']}")
 
     def update_clients_accounts_file(self, clients_accounts):
         with open("clients_accounts.csv", "w") as csvfile:
