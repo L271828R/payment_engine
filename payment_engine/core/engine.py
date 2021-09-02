@@ -1,5 +1,6 @@
-import os
 import csv
+from .file_reader import FileReader
+from .printer import print_accounts
 
 class TotalsHelper():
     def __init__(self):
@@ -8,8 +9,8 @@ class TotalsHelper():
     
 
 class PaymentEngine():
-    def __init__(self, write_on_update=True):
-        self.write_on_update = write_on_update
+    def __init__(self, print_on_update=True):
+        self.print_on_update = print_on_update
         self.transactions_by_client = None
         self.totals_by_client = None
 
@@ -28,28 +29,8 @@ class PaymentEngine():
                 row = clients_accounts[client]
                 writer.writerow(row)
 
-
     def transaction_file_reader(self, path_to_file):
-        transactions_by_clients = {}
-        file_body_extension_tup = os.path.splitext(path_to_file)
-        if file_body_extension_tup[1] == ".csv":
-            with open(path_to_file) as csvfile:
-                reader = csv.DictReader(csvfile)
-                rows = [ { k.strip(): v.strip() for k,v in row.items() } for row in reader ]
-                for row in rows:
-                    trans_type = row['type']
-                    tx         = row['tx']
-                    client_id  = row['client']
-                    try:
-                        amount     = float(row['amount'])
-                    except ValueError:
-                        amount     = 0
-                    if client_id not in transactions_by_clients:
-                        transactions_by_clients[client_id] = []
-                    transactions_by_clients[client_id].append({'tx': tx,'type':trans_type, 'amount': amount})
-                return transactions_by_clients
-        else:
-            raise(Exception("FILE NOT SUPPORTED, CSV ONLY"))
+        return FileReader.readfile(path_to_file)
 
     def _deposits_logic(self, client, tx_id, transaction, totals):
         if tx_id not in totals.processed_transactions:
@@ -117,20 +98,26 @@ class PaymentEngine():
                     is_locked = False
                 if trans_type == "deposit" and not is_locked:
                     self._deposits_logic(client, tx_id, transaction, totals)
-                    if self.write_on_update:
-                        self.update_clients_accounts_file(totals.clients)
+                    if self.print_on_update:
+                        print_accounts(totals.clients, f"processing deposit = {transaction['amount']} for client = {client}")
                 elif trans_type == "withdrawal" and not is_locked:
                     self._withdrawals_logic(client, tx_id, transaction, totals)
-                    if self.write_on_update:
-                        self.update_clients_accounts_file(totals.clients)
+                    if self.print_on_update:
+                        #print(totals.clients)
+                        print_accounts(totals.clients, f"processing withdrawal = {transaction['amount']} for client = {client}")
                 elif trans_type == "dispute" and not is_locked:
                     self._disputes_logic(client, tx_id, totals)
-                    if self.write_on_update:
-                        self.update_clients_accounts_file(totals.clients)
+                    if self.print_on_update:
+                        #print(totals.clients)
+                        print_accounts(totals.clients, f"processing dispute for client = {client}")
                 elif trans_type == "resolve" and not is_locked:
                     self._resolves_logic(client, tx_id, transaction, totals)
+                    if self.print_on_update:
+                        print_accounts(totals.clients, f"processing resolve for client = {client}")
                 elif trans_type == "chargeback" and not is_locked:
                     self._chargeback_logic(client, tx_id, transaction, totals)
+                    if self.print_on_update:
+                        print_accounts(totals.clients, f"processing chargeback for client = {client}")
                 assert(totals.clients[client]["total"] == totals.clients[client]["available"] + totals.clients[client]["held"])
                 
         return totals.clients
