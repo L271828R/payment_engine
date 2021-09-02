@@ -9,7 +9,7 @@ class TotalsHelper():
     
 
 class PaymentEngine():
-    def __init__(self, print_on_update=True):
+    def __init__(self, print_on_update=False):
         self.print_on_update = print_on_update
         self.transactions_by_client = None
         self.totals_by_client = None

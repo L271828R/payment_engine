@@ -14,7 +14,7 @@ def test_base_happy_path():
     expected = {'1': 
         {'client':'1', 'total': 1.5, 'available': 1.5, 'held': 0.0, 'locked': 'false'},
          '2': {'client': '2', 'total': 2.0, 'available': 2.0, 'held': 0.0, 'locked':'false'}}
-    transaction_engine = PaymentEngine(write_on_update=False)
+    transaction_engine = PaymentEngine()
     transaction_engine.transactions_by_clients = data
     transaction_engine.process_transactions()
     results = transaction_engine.clients_accounts
@@ -30,7 +30,7 @@ def test_one_dispute_one_client():
         }
     expected = {'1': 
         {'client': '1', 'total': 1.5, 'available': 0.5, 'held': 1.0, 'locked':'false'}}
-    transaction_engine = PaymentEngine(write_on_update=False)
+    transaction_engine = PaymentEngine()
     transaction_engine.transactions_by_clients = data
     transaction_engine.process_transactions()
     results = transaction_engine.clients_accounts
@@ -46,7 +46,7 @@ def test_one_dispute_one_client_large():
         }
     expected = {'1': 
         {'client': '1', 'total': 1.5, 'available': -0.5, 'held': 2.0, 'locked':'false'}}
-    transaction_engine = PaymentEngine(write_on_update=False)
+    transaction_engine = PaymentEngine()
     transaction_engine.transactions_by_clients = data
     transaction_engine.process_transactions()
     results = transaction_engine.clients_accounts
@@ -64,7 +64,7 @@ def test_one_dispute_one_resolve_one_client():
         }
     expected = {'1': 
         {'client': '1', 'total': 1.5, 'available': 1.5, 'held': 0.0, 'locked':'false'}}
-    transaction_engine = PaymentEngine(write_on_update=False)
+    transaction_engine = PaymentEngine()
     transaction_engine.transactions_by_clients = data
     transaction_engine.process_transactions()
     results = transaction_engine.clients_accounts
@@ -83,7 +83,7 @@ def test_one_dispute_one_chargeback():
         }
     expected = {'1': 
         {'client': '1', 'total': 0.5, 'available': 0.5, 'held': 0.0, 'locked':'true'}}
-    transaction_engine = PaymentEngine(write_on_update=False)
+    transaction_engine = PaymentEngine()
     transaction_engine.transactions_by_clients = data
     transaction_engine.process_transactions()
     results = transaction_engine.clients_accounts
@@ -103,7 +103,7 @@ def test_neg_one_dispute_one_chargeback_lock_logic():
         }
     expected = {'1': 
         {'client': '1', 'total': 0.5, 'available': 0.5, 'held': 0.0, 'locked':'true'}}
-    transaction_engine = PaymentEngine(write_on_update=False)
+    transaction_engine = PaymentEngine()
     transaction_engine.transactions_by_clients = data
     transaction_engine.process_transactions()
     results = transaction_engine.clients_accounts
@@ -118,7 +118,7 @@ def test_neg_duplicate_deposits():
         }
     expected = {'1': 
         {'client': '1', 'total': 1.0, 'available': 1.0, 'held': 0.0, 'locked':'false'}}
-    transaction_engine = PaymentEngine(write_on_update=False)
+    transaction_engine = PaymentEngine()
     transaction_engine.transactions_by_clients = data
     transaction_engine.process_transactions()
     results = transaction_engine.clients_accounts
@@ -133,7 +133,7 @@ def test_neg_duplicate_withdrawals():
         }
     expected = {'1': 
         {'client': '1', 'total': 1.0, 'available': 1.0, 'held': 0.0, 'locked':'false'}}
-    transaction_engine = PaymentEngine(write_on_update=False)
+    transaction_engine = PaymentEngine()
     transaction_engine.transactions_by_clients = data
     transaction_engine.process_transactions()
     results = transaction_engine.clients_accounts
@@ -149,7 +149,7 @@ def neg_duplicate_dispute():
         }
     expected = {'1': 
         {'client': '1', 'total': -1.0, 'available': 1.0, 'held': -2.0, 'locked':'false'}}
-    transaction_engine = PaymentEngine(write_on_update=False)
+    transaction_engine = PaymentEngine()
     transaction_engine.transactions_by_clients = data
     transaction_engine.process_transactions()
     results = transaction_engine.clients_accounts
@@ -168,7 +168,7 @@ def neg_duplicate_resolves():
         }
     expected = {'1': 
         {'client': '1', 'total': 1.0, 'available': 1.0, 'held': 0.0, 'locked':'false'}}
-    transaction_engine = PaymentEngine(write_on_update=False)
+    transaction_engine = PaymentEngine()
     transaction_engine.transactions_by_clients = data
     transaction_engine.process_transactions()
     results = transaction_engine.clients_accounts
@@ -186,7 +186,7 @@ def test_neg_duplicate_chargebacks_with_negative_held():
         }
     expected = {'1': 
         {'client': '1', 'total': 1.0, 'available': 1.0, 'held': 0.0, 'locked':'false'}}
-    transaction_engine = PaymentEngine(write_on_update=False)
+    transaction_engine = PaymentEngine()
     transaction_engine.transactions_by_clients = data
     transaction_engine.process_transactions()
     results = transaction_engine.clients_accounts
@@ -201,7 +201,7 @@ def test_neg_dispute_on_a_withdrawal():
         }
     expected = {'1': 
         {'client': '1', 'total': 1.0, 'available': 1.0, 'held': 0.0, 'locked':'false'}}
-    transaction_engine = PaymentEngine(write_on_update=False)
+    transaction_engine = PaymentEngine()
     transaction_engine.transactions_by_clients = data
     transaction_engine.process_transactions()
     results = transaction_engine.clients_accounts
@@ -218,7 +218,7 @@ def test_neg_dispute_on_a_withdrawal_and_chargeback():
         }
     expected = {'1': 
         {'client': '1', 'total': 1.0, 'available': 1.0, 'held': 0.0, 'locked':'false'}}
-    transaction_engine = PaymentEngine(write_on_update=False)
+    transaction_engine = PaymentEngine()
     transaction_engine.transactions_by_clients = data
     transaction_engine.process_transactions()
     results = transaction_engine.clients_accounts
