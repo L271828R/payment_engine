@@ -75,4 +75,14 @@ You will need Python3 in order to run this script.
    python payment_engine.py transactions.csv
    ```
 
+## Correctness
 
+This project uses pytest for running unit tests.
+Tests are located in the tests folder.
+
+## Running tests
+
+1. run all tests
+   ```sh
+   py.test
+   ```
