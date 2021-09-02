@@ -66,6 +66,22 @@ def test_neg_duplicate_dispute():
     assert (expected == results)
 
 
+def test_neg_duplicate_chargeback():
+    data = {'1': [
+            {'tx': '1', 'type': 'deposit', 'amount': 2.0},    #  total 2.0 available 2.0 held 0.0
+            {'tx': '2', 'type': 'withdrawal', 'amount': 1.0}, #  total 1.0 available 1.0 held 0.0
+            {'tx': '1', 'type': 'dispute', },                 #  total 1.0 available -1.0 held 2.0
+            {'tx': '1', 'type': 'chargeback', },              #  total -1.0 available -1.0 held 0.0 
+            {'tx': '1', 'type': 'chargeback', }               #  duplicate
+            ], 
+        }
+    expected = {'1': 
+        {'client': '1', 'total': -1.0, 'available': -1.0, 'held': 0.0, 'locked':'true'}}
+    payment_engine = PaymentEngine()
+    payment_engine.transactions_by_clients = data
+    payment_engine.process_transactions()
+    results = payment_engine.clients_accounts
+    assert (expected == results)
 
 def neg_duplicate_resolves():
     data = {'1': [
