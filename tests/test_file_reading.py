@@ -1,9 +1,6 @@
 import pytest
 from payment_engine.core.engine import PaymentEngine
 
-
-
-
 def test_read_csv_file_version1():
     path_to_file = "tests/test_files/transactions.csv"
     payment_engine = PaymentEngine(write_on_update=False)
@@ -57,3 +54,10 @@ def test_happy_path_file_version2():
     payment_engine.process_transactions()
     results = payment_engine.clients_accounts
     assert (expected == results)
+
+def test_unsupported_file_type():
+    path_to_file = "tests/test_files/transactions.abc"
+    payment_engine = PaymentEngine(write_on_update=False)
+    with pytest.raises(Exception) as e:
+        payment_engine.extract_transactions_by_client(path_to_file)
+    assert(str(e.value) == "FILE NOT SUPPORTED, CSV ONLY")
