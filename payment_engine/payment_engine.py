@@ -6,7 +6,8 @@ from core.engine import PaymentEngine
 
 
 def main():
-    path_to_file = sys.argv[1]
+    # path_to_file = sys.argv[1]
+    path_to_file = "tests/test_files/transactions_dup_dispute.csv"
     payment_engine = PaymentEngine(print_on_update=True)
     payment_engine.extract_transactions_by_client(path_to_file)
     payment_engine.process_transactions()

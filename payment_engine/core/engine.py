@@ -1,6 +1,7 @@
 import csv
 from .file_reader import FileReader
 from .printer import print_accounts
+from .engine_exceptions import UnknownTypeException
 
 
 class TotalsHelper():
@@ -59,14 +60,15 @@ class PaymentEngine():
 
     def _disputes_logic(self, client, tx_id, totals):
         if tx_id in totals.tx_id_amount_lookup and \
-                totals.processed_transactions[tx_id] == "deposit":
+                totals.processed_transactions[tx_id] == "deposit" and \
+                tx_id not in totals.disputed_resolution:
             amount = totals.tx_id_amount_lookup[tx_id]
             totals.clients[client]["available"] -= amount
             totals.clients[client]["held"] += amount
-            totals.disputed_resolution[tx_id] = None
             totals.clients[client]["total"] = \
                 totals.clients[client]["available"] + \
                 totals.clients[client]["held"]
+            totals.disputed_resolution[tx_id] = None
             assert(totals.clients[client]["total"] ==
                    totals.clients[client]["available"] +
                    totals.clients[client]["held"])
@@ -114,6 +116,9 @@ class PaymentEngine():
                                       "locked": "false"}
             for transaction in transactions_by_clients[client]:
                 trans_type = transaction['type']
+                if trans_type not in ["deposit", "withdrawal",
+                                      "dispute", "resolve", "chargeback"]:
+                    raise UnknownTypeException(f"{trans_type} is not supported")
                 tx_id = transaction['tx']
                 if totals.clients[client]["locked"] == "true":
                     is_locked = True
