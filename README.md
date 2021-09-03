@@ -87,7 +87,7 @@ This project uses pytest for running unit tests.
 Tests are located in the tests folder.
 
 ## Running tests
-
+Make sure you are at the root of the project
 1. run all tests
    ```sh
    py.test
