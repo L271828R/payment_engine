@@ -161,3 +161,17 @@ def test_neg_unsupported_transaction():
         payment_engine.transactions_by_clients = data
         payment_engine.process_transactions()
     assert(str(e.value) == "unsupported is not supported")
+
+def test_neg_withdrawal_greater_than_deposit():
+    data = {'1': [
+            {'tx': '1', 'type': 'deposit', 'amount': 2.0},    #  total 2.0 available 2.0 held 0.0
+            {'tx': '2', 'type': 'withdrawal', 'amount': 3.0}, #  total 1.0 available 1.0 held 0.0
+            ], 
+        }
+    expected = {'1': 
+        {'client': '1', 'total': 2.0, 'available': 2.0, 'held': 0.0, 'locked':'false'}}
+    payment_engine = PaymentEngine()
+    payment_engine.transactions_by_clients = data
+    payment_engine.process_transactions()
+    results = payment_engine.client_accounts
+    assert (expected == results)
