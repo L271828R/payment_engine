@@ -3,9 +3,6 @@ from core.engine import PaymentEngine
 from core import python_version_validation
 
 # TODO what if chargeback does not point back to dispute
-# TODO raise any unsupported transaction types
-# TODO test for non supported type
-
 
 def main():
     path_to_file = sys.argv[1]

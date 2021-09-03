@@ -15,7 +15,7 @@ def test_base_happy_path():
     payment_engine = PaymentEngine()
     payment_engine.transactions_by_clients = data
     payment_engine.process_transactions()
-    results = payment_engine.clients_accounts
+    results = payment_engine.client_accounts
     assert (expected == results)
 
 def test_one_dispute_one_client():
@@ -31,7 +31,7 @@ def test_one_dispute_one_client():
     payment_engine = PaymentEngine()
     payment_engine.transactions_by_clients = data
     payment_engine.process_transactions()
-    results = payment_engine.clients_accounts
+    results = payment_engine.client_accounts
     assert (expected == results)
 
 def test_one_dispute_one_client_large():
@@ -47,7 +47,7 @@ def test_one_dispute_one_client_large():
     payment_engine = PaymentEngine()
     payment_engine.transactions_by_clients = data
     payment_engine.process_transactions()
-    results = payment_engine.clients_accounts
+    results = payment_engine.client_accounts
     assert (expected == results)
 
 def test_one_dispute_one_resolve_one_client():
@@ -65,7 +65,7 @@ def test_one_dispute_one_resolve_one_client():
     payment_engine = PaymentEngine()
     payment_engine.transactions_by_clients = data
     payment_engine.process_transactions()
-    results = payment_engine.clients_accounts
+    results = payment_engine.client_accounts
     assert (expected == results)
 
 
@@ -84,6 +84,6 @@ def test_one_dispute_one_chargeback():
     payment_engine = PaymentEngine()
     payment_engine.transactions_by_clients = data
     payment_engine.process_transactions()
-    results = payment_engine.clients_accounts
+    results = payment_engine.client_accounts
     assert (expected == results)
 

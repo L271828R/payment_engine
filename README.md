@@ -18,6 +18,9 @@
     <li><a href="#usage">Usage</a></li>
     <li><a href="#correctness">Correctness</a></li>
     <li><a href="#running-tests">Running Tests</a></li>
+    <li><a href="#types-of-tests">Types of tests</a></li>
+    <li><a href="#completeness">Completeness</a></li>
+    <li><a href="#safety">Safety</a></li>
   </ol>
 </details>
 
@@ -89,3 +92,22 @@ Tests are located in the tests folder.
    ```sh
    py.test
    ```
+
+## Types of tests
+
+1. happy path tests
+2. negative scenarios
+3. platform testing
+4. precision testing 
+
+
+## Completeness
+
+I believe all transactions ( Deposits, Withdrawals, Disputes, Resolves and Chargebacks ) are accountend for.
+
+
+## Safety
+
+I am perhaps readiing the full input file as once. 
+Python can handle large file sizes, but nonetheless this may pose a risk.
+

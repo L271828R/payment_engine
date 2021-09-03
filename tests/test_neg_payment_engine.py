@@ -1,4 +1,5 @@
 from payment_engine.core.engine import PaymentEngine
+import pytest
 
 def test_neg_one_dispute_one_chargeback_lock_logic():
     data = {'1': [
@@ -16,7 +17,7 @@ def test_neg_one_dispute_one_chargeback_lock_logic():
     payment_engine = PaymentEngine()
     payment_engine.transactions_by_clients = data
     payment_engine.process_transactions()
-    results = payment_engine.clients_accounts
+    results = payment_engine.client_accounts
     assert (expected == results)
 
 
@@ -31,7 +32,7 @@ def test_neg_duplicate_deposits():
     payment_engine = PaymentEngine()
     payment_engine.transactions_by_clients = data
     payment_engine.process_transactions()
-    results = payment_engine.clients_accounts
+    results = payment_engine.client_accounts
     assert (expected == results)
 
 def test_neg_duplicate_withdrawals():
@@ -46,7 +47,7 @@ def test_neg_duplicate_withdrawals():
     payment_engine = PaymentEngine()
     payment_engine.transactions_by_clients = data
     payment_engine.process_transactions()
-    results = payment_engine.clients_accounts
+    results = payment_engine.client_accounts
     assert (expected == results)
 
 def test_neg_duplicate_dispute():
@@ -62,7 +63,7 @@ def test_neg_duplicate_dispute():
     payment_engine = PaymentEngine()
     payment_engine.transactions_by_clients = data
     payment_engine.process_transactions()
-    results = payment_engine.clients_accounts
+    results = payment_engine.client_accounts
     assert (expected == results)
 
 
@@ -80,7 +81,7 @@ def test_neg_duplicate_chargeback():
     payment_engine = PaymentEngine()
     payment_engine.transactions_by_clients = data
     payment_engine.process_transactions()
-    results = payment_engine.clients_accounts
+    results = payment_engine.client_accounts
     assert (expected == results)
 
 def neg_duplicate_resolves():
@@ -97,7 +98,7 @@ def neg_duplicate_resolves():
     payment_engine = PaymentEngine()
     payment_engine.transactions_by_clients = data
     payment_engine.process_transactions()
-    results = payment_engine.clients_accounts
+    results = payment_engine.client_accounts
     assert (expected == results)
 
 
@@ -115,7 +116,7 @@ def test_neg_duplicate_chargebacks_with_negative_held():
     payment_engine = PaymentEngine()
     payment_engine.transactions_by_clients = data
     payment_engine.process_transactions()
-    results = payment_engine.clients_accounts
+    results = payment_engine.client_accounts
     assert (expected == results)
 
 def test_neg_dispute_on_a_withdrawal():
@@ -130,7 +131,7 @@ def test_neg_dispute_on_a_withdrawal():
     payment_engine = PaymentEngine()
     payment_engine.transactions_by_clients = data
     payment_engine.process_transactions()
-    results = payment_engine.clients_accounts
+    results = payment_engine.client_accounts
     assert (expected == results)
 
 
@@ -147,5 +148,16 @@ def test_neg_dispute_on_a_withdrawal_and_chargeback():
     payment_engine = PaymentEngine()
     payment_engine.transactions_by_clients = data
     payment_engine.process_transactions()
-    results = payment_engine.clients_accounts
+    results = payment_engine.client_accounts
     assert (expected == results)
+
+def test_neg_unsupported_transaction():
+    data = {'1': [
+            {'tx': '1', 'type': 'unsupported', 'amount': 2.0}    #  total 2.0 available 2.0 held 0.0
+            ], 
+        }
+    with pytest.raises(Exception) as e:
+        payment_engine = PaymentEngine()
+        payment_engine.transactions_by_clients = data
+        payment_engine.process_transactions()
+    assert(str(e.value) == "unsupported is not supported")

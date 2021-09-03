@@ -40,7 +40,7 @@ def test_happy_path_file_version():
     payment_engine = PaymentEngine()
     payment_engine.extract_transactions_by_client(path_to_file)
     payment_engine.process_transactions()
-    results = payment_engine.clients_accounts
+    results = payment_engine.client_accounts
     assert (expected == results)
 
 
@@ -52,7 +52,7 @@ def test_happy_path_file_version2():
     payment_engine = PaymentEngine()
     payment_engine.extract_transactions_by_client(path_to_file)
     payment_engine.process_transactions()
-    results = payment_engine.clients_accounts
+    results = payment_engine.client_accounts
     assert (expected == results)
 
 def test_unsupported_file_type():

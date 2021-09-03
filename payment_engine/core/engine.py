@@ -169,4 +169,8 @@ class PaymentEngine():
                 assert(totals.clients[client]["total"] ==
                        totals.clients[client]["available"] +
                        totals.clients[client]["held"])
+        for client in transactions_by_clients:
+            totals.clients[client]['total'] = round(totals.clients[client]['total'], 4)
+            totals.clients[client]['available'] = round(totals.clients[client]['available'], 4)
+            totals.clients[client]['held'] = round(totals.clients[client]['held'], 4)
         return totals.clients
